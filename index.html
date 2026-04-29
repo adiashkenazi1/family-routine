@@ -325,6 +325,7 @@ body {
 
 .empty-day { text-align:center; padding:16px; color:var(--muted); font-size:14px; }
 
+/* ─── PIN SCREEN ─── */
 /* ─── SCREENS ─── */
 .screen { display:none; min-height:100vh; }
 .screen.active { display:block; }
@@ -472,6 +473,7 @@ body {
 </head>
 <body>
 
+
 <!-- Sidebar overlay -->
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
@@ -574,7 +576,6 @@ const MEDS_DAYS = ['thu','fri','sat','sun'];
 // ════════════════════════════════════════════
 function getMiliTasks(day) {
   const { id, hasGan, isFri, isSat, morningOnly } = day;
-  const hasMeds = MEDS_DAYS.includes(id);
   const t = [];
 
   // ── MORNING ──
@@ -587,9 +588,13 @@ function getMiliTasks(day) {
   t.push({ id:`mili-${id}-hygiene`, title:'היגיינה', icon:'🪥', time:'morning', child:'mili',
     desc:'שטיפת פנים וידיים 💧\nצחצוח שיניים 🦷' });
 
-  if (hasMeds) {
+  {
+    const antibioticMorning = ['thu','fri','sat','sun'].includes(id);
+    const medsDesc = antibioticMorning
+      ? 'פילפילון כתום + אנטיביוטיקה 💊'
+      : 'פילפילון כתום 💊';
     t.push({ id:`mili-${id}-meds`, title:'תרופות', icon:'💊', time:'morning', child:'mili',
-      desc:'פילפילון כתום + אנטיביוטיקה 💊\n⚠️ רק עד יום ראשון בבוקר!' });
+      desc: medsDesc });
   }
 
   t.push({ id:`mili-${id}-dress`, title:'לבוש', icon:'👗', time:'morning', child:'mili',
@@ -649,6 +654,15 @@ function getMiliTasks(day) {
 
   t.push({ id:`mili-${id}-toilet`, title:'שירותים לפני השינה', icon:'🚽', time:'evening', child:'mili',
     desc:'לוודא שמילי הולכת לשירותים לפני שנרדמת 🚽' });
+
+  {
+    const antibioticEvening = ['thu','fri','sat'].includes(id);
+    const medsEveDesc = antibioticEvening
+      ? 'פילפילון כתום + אנטיביוטיקה 💊'
+      : 'פילפילון כתום 💊';
+    t.push({ id:`mili-${id}-meds-eve`, title:'תרופות ערב', icon:'💊', time:'evening', child:'mili',
+      desc: medsEveDesc });
+  }
 
   t.push({ id:`mili-${id}-bedprep`, title:'התארגנות לשינה', icon:'🛏️', time:'evening', child:'mili',
     desc:'• צחצוח שיניים 🦷\n• להתלבש בחדר 🌙\n• לסדר: סדין, ציפיות, שמיכות 🛏️\n• להכין בגדים להחלפה ליד — למקרה שיברח לה\n• ישנה עם תחתונים רגילים 💕' });
@@ -729,7 +743,7 @@ function getTomTasks(day) {
     desc:'להכניס למקלחת עד השעה 19:00 🚿\n💊 חשוב: תום צריך לקבל ברזל!' });
 
   t.push({ id:`tom-${id}-bedprep`, title:'התארגנות לשינה', icon:'🛏️', time:'evening', child:'tom',
-    desc:'להתלבש לשינה בחדר 🌙' });
+    desc:'• צחצוח שיניים 🦷\n• להתלבש לשינה בחדר 🌙' });
 
   t.push({ id:`tom-${id}-sleep`, title:'השכבה', icon:'🌙', time:'evening', child:'tom',
     desc:'📖 סיפור לפני השינה עם מילי\nאו 🎵 לשיר שיר על הידיים ולהניח במיטה 💤' });
