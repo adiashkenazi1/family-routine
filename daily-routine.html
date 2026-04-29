@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>סדר היום שלנו 🦄</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --mili: #FF6B9D;
+  --mili-light: #FFD6E7;
+  --mili-bg: #FFF5F9;
+  --tom: #00BCD4;
+  --tom-light: #B2EBF2;
+  --tom-bg: #F0FDFF;
+  --morning-col: #FF9800;
+  --afternoon-col: #2196F3;
+  --evening-col: #7B1FA2;
+  --success: #43A047;
+  --bg: #EEF2FF;
+  --card: #FFFFFF;
+  --text: #1A1A2E;
+  --muted: #999;
+  --radius: 20px;
+  --shadow: 0 3px 18px rgba(0,0,0,0.09);
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+body {
+  font-family: 'Heebo', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  direction: rtl;
+  min-height: 100vh;
+  padding-bottom: 40px;
+}
+
+/* ─── HEADER ─── */
+.app-header {
+  background: linear-gradient(135deg, #FF6B9D 0%, #9C27B0 55%, #00BCD4 100%);
+  padding: 16px 16px 0;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.22);
+}
+.app-title {
+  font-size: 20px;
+  font-weight: 900;
+  text-align: center;
+  color: #fff;
+  margin-bottom: 12px;
+  letter-spacing: -0.3px;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+.tabs {
+  display: flex;
+  border-radius: 14px 14px 0 0;
+  overflow: hidden;
+  background: rgba(255,255,255,0.18);
+}
+.tab-btn {
+  flex: 1;
+  padding: 11px 4px;
+  font-family: 'Heebo', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  border: none;
+  background: none;
+  color: rgba(255,255,255,0.75);
+  cursor: pointer;
+  transition: all 0.22s;
+}
+.tab-btn.active {
+  background: white;
+  border-radius: 14px 14px 0 0;
+}
+.tab-btn.active.t-mili { color: var(--mili); }
+.tab-btn.active.t-tom  { color: #0097A7; }
+.tab-btn.active.t-all  { color: #7B1FA2; }
+
+/* ─── CONTENT ─── */
+.content {
+  padding: 14px 12px 0;
+  max-width: 540px;
+  margin: 0 auto;
+}
+
+/* ─── DAY CARD ─── */
+.day-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  margin-bottom: 14px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  transition: box-shadow 0.3s, border 0.3s;
+  border: 2px solid transparent;
+}
+.day-card.all-done {
+  border-color: #FFD700;
+  box-shadow: 0 4px 24px rgba(255,215,0,0.35);
+}
+.day-card-header {
+  padding: 13px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+  border-radius: 18px 18px 0 0;
+}
+.day-card-header.mili-header { background: linear-gradient(to left, var(--mili-bg), #fff); }
+.day-card-header.tom-header  { background: linear-gradient(to left, var(--tom-bg), #fff); }
+.day-card-header.all-header  { background: linear-gradient(to left, #FAF0FF, #fff); }
+.day-left { display: flex; flex-direction: column; gap: 5px; }
+.day-name { font-size: 18px; font-weight: 900; }
+.day-name-today { font-size: 11px; font-weight: 700; color: #FF9800; margin-right: 6px; }
+.day-badges { display: flex; gap: 5px; flex-wrap: wrap; }
+.badge {
+  font-size: 11px; font-weight: 700;
+  padding: 2px 8px; border-radius: 20px;
+}
+.badge-gan    { background: #E8F5E9; color: #2E7D32; }
+.badge-nogan  { background: #FFF3E0; color: #E65100; }
+.badge-short  { background: #F3E5F5; color: #7B1FA2; }
+.badge-morn   { background: #E3F2FD; color: #1565C0; }
+.badge-today  { background: #FFE0B2; color: #E65100; }
+.day-right { display: flex; align-items: center; gap: 6px; }
+
+/* Progress ring */
+.progress-ring-wrap {
+  position: relative; width: 46px; height: 46px;
+}
+.progress-ring-wrap svg {
+  position: absolute; top:0; left:0;
+  transform: rotate(-90deg);
+}
+.progress-ring-bg { fill:none; stroke:#EEE; stroke-width:4; }
+.progress-ring-fill { fill:none; stroke-width:4; stroke-linecap:round; transition: stroke-dashoffset 0.5s ease; }
+.progress-ring-text {
+  position: absolute; top:50%; left:50%;
+  transform: translate(-50%,-50%);
+  font-size: 10px; font-weight: 800; color: var(--text);
+  white-space: nowrap;
+}
+.toggle-icon { font-size: 18px; color: var(--muted); transition: transform 0.3s; }
+.day-card.open .toggle-icon { transform: rotate(180deg); }
+
+/* Day body */
+.day-body { display: none; padding: 4px 10px 12px; }
+.day-card.open .day-body { display: block; }
+
+/* ─── TIME SECTION ─── */
+.time-section { margin-bottom: 2px; }
+.time-label {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 800;
+  padding: 5px 10px; border-radius: 10px;
+  margin-bottom: 5px; margin-top: 10px;
+  cursor: pointer; user-select: none;
+}
+.time-label.morning   { background: #FFF8E1; color: #F57F17; }
+.time-label.afternoon { background: #E3F2FD; color: #1565C0; }
+.section-check-all {
+  margin-right: auto;
+  font-size: 11px; font-weight: 700;
+  padding: 2px 9px; border-radius: 20px;
+  border: 1.5px solid currentColor;
+  background: transparent; cursor: pointer;
+  font-family: 'Heebo', sans-serif;
+  opacity: 0.75; transition: opacity 0.2s, background 0.2s;
+  color: inherit;
+  white-space: nowrap;
+}
+.section-check-all:hover { opacity: 1; }
+.section-check-all.all-checked { background: currentColor; }
+.section-check-all.all-checked span { color: #fff; filter: invert(1) brightness(2); }
+.time-label.evening   { background: #EDE7F6; color: #4527A0; }
+
+/* ─── TASK ITEM ─── */
+.task-item {
+  border-radius: 12px; margin-bottom: 6px; overflow: hidden;
+  background: #FAFAFA; border: 1.5px solid #EFEFEF;
+  transition: border-color 0.2s, opacity 0.25s;
+}
+.task-item.done { opacity: 0.52; }
+.task-item.expanded { border-color: #DDD; background: #F5F5F5; }
+.task-head {
+  display: flex; align-items: center;
+  padding: 10px 11px; gap: 8px; cursor: pointer;
+}
+.task-check-btn {
+  width: 26px; height: 26px; min-width: 26px;
+  border-radius: 50%; border: 2.5px solid #CCC;
+  background: white; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; transition: all 0.22s; flex-shrink: 0;
+}
+.task-item.done .task-check-btn {
+  background: var(--success); border-color: var(--success); color: white;
+}
+.task-icon-emoji { font-size: 18px; min-width: 22px; text-align: center; }
+.task-title-wrap { flex: 1; min-width: 0; }
+.task-title-text { font-size: 14.5px; font-weight: 600; line-height: 1.3; }
+.task-item.done .task-title-text { text-decoration: line-through; color: var(--muted); }
+.child-label {
+  font-size: 11px; font-weight: 700;
+  padding: 2px 8px; border-radius: 20px;
+  white-space: nowrap; flex-shrink: 0;
+}
+.child-label.mili { background: var(--mili-light); color: #C2185B; }
+.child-label.tom  { background: var(--tom-light); color: #00838F; }
+.task-chevron {
+  color: var(--muted); font-size: 12px;
+  transition: transform 0.25s; flex-shrink: 0;
+}
+.task-item.expanded .task-chevron { transform: rotate(180deg); }
+.task-desc {
+  overflow: hidden; max-height: 0;
+  transition: max-height 0.3s ease, padding 0.3s;
+  padding: 0 12px;
+}
+.task-item.expanded .task-desc { max-height: 600px; padding: 10px 12px 14px; }
+.task-desc p {
+  font-size: 13.5px; color: #555;
+  line-height: 1.75; white-space: pre-line;
+}
+
+/* Reset button */
+.day-reset-btn {
+  font-size: 11px; font-weight: 600;
+  color: var(--muted); background: none;
+  border: 1px solid #DDD; border-radius: 20px;
+  padding: 4px 12px; cursor: pointer;
+  font-family: 'Heebo', sans-serif;
+  margin: 6px 2px 2px 0;
+  transition: background 0.2s;
+}
+.day-reset-btn:hover { background: #F0F0F0; }
+
+/* ─── ANIMATION STAGE ─── */
+#unicorn-stage {
+  position: fixed; inset: 0;
+  pointer-events: none; z-index: 9999;
+  overflow: hidden;
+}
+
+/* == UNICORN == */
+.uni-flyer {
+  position: absolute; font-size: 66px;
+  animation: unifly 2.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  filter: drop-shadow(0 0 18px rgba(255,60,255,0.85));
+}
+@keyframes unifly {
+  0%   { right:-160px; transform:translateY(0px);   opacity:0; }
+  6%   { opacity:1; }
+  22%  { transform:translateY(-38px); }
+  44%  { transform:translateY(30px); }
+  64%  { transform:translateY(-26px); }
+  82%  { transform:translateY(14px); }
+  93%  { opacity:1; }
+  100% { right:115vw; transform:translateY(0px); opacity:0; }
+}
+.uni-trail {
+  position: absolute; font-size: 42px; opacity: 0.8;
+  animation: unifly 2.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation-delay: 0.18s;
+  filter: blur(1px);
+}
+.uni-sparkle {
+  position: absolute;
+  animation: uniSparkle 1.4s ease-out forwards;
+}
+@keyframes uniSparkle {
+  0%   { transform: scale(0) rotate(0deg);   opacity:1; }
+  40%  { transform: scale(2) rotate(180deg); opacity:1; }
+  100% { transform: scale(0) rotate(370deg) translateY(-55px); opacity:0; }
+}
+
+/* == CLAPPING (Slack-style) == */
+.clap-flash {
+  position: absolute; inset: 0;
+  background: rgba(255,255,255,0);
+  animation: clapFlash 0.45s ease-out forwards;
+}
+@keyframes clapFlash {
+  0%   { background: rgba(255,255,255,0); }
+  25%  { background: rgba(255,255,255,0.55); }
+  100% { background: rgba(255,255,255,0); }
+}
+.clap-main {
+  position: absolute; top: 50%; left: 50%;
+  font-size: 110px; line-height: 1;
+  animation: clapMain 3.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+@keyframes clapMain {
+  0%   { transform:translate(-50%,-50%) scale(0)   rotate(-20deg); opacity:0; }
+  16%  { transform:translate(-50%,-50%) scale(1.5) rotate( 12deg); opacity:1; }
+  30%  { transform:translate(-65%,-50%) scale(1.1) rotate(-14deg); }
+  44%  { transform:translate(-35%,-50%) scale(1.2) rotate( 12deg); }
+  56%  { transform:translate(-60%,-50%) scale(1.0) rotate( -8deg); }
+  66%  { transform:translate(-40%,-50%) scale(1.1) rotate(  6deg); }
+  75%  { transform:translate(-50%,-50%) scale(1.0) rotate(  0deg); opacity:1; }
+  88%  { transform:translate(-50%,-50%) scale(1.05);               opacity:1; }
+  100% { transform:translate(-50%,-50%) scale(0.1) rotate( 10deg); opacity:0; }
+}
+.clap-burst {
+  position: absolute; top:50%; left:50%;
+  font-size: var(--fs);
+  animation: clapBurst var(--d) ease-out var(--delay) both;
+}
+@keyframes clapBurst {
+  0%   { transform:translate(-50%,-50%) scale(0); opacity:0; }
+  18%  { transform:translate(calc(-50% + var(--tx)*.25), calc(-50% + var(--ty)*.25)) scale(1.4); opacity:1; }
+  55%  { transform:translate(calc(-50% + var(--tx)),     calc(-50% + var(--ty)))     scale(0.9); opacity:1; }
+  100% { transform:translate(calc(-50% + var(--tx)*1.5), calc(-50% + var(--ty)*1.5)) scale(0.1); opacity:0; }
+}
+
+/* ─── COMPLETED DAY BANNER ─── */
+.all-done-banner {
+  text-align: center; font-size: 15px; font-weight: 700;
+  color: #E65100; padding: 10px;
+  background: linear-gradient(135deg, #FFF8E1, #FFF3E0);
+  border-radius: 12px; margin-bottom: 8px;
+}
+
+.empty-day { text-align:center; padding:16px; color:var(--muted); font-size:14px; }
+
+/* ─── SCREENS ─── */
+.screen { display:none; min-height:100vh; }
+.screen.active { display:block; }
+
+/* ─── SIDEBAR ─── */
+.sidebar-overlay {
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,0.45); z-index:900;
+}
+.sidebar-overlay.open { display:block; }
+.sidebar {
+  position:fixed; top:0; right:-290px;
+  width:270px; height:100%;
+  background:white; z-index:1000;
+  transition:right 0.28s cubic-bezier(0.4,0,0.2,1);
+  box-shadow:-6px 0 30px rgba(0,0,0,0.18);
+  display:flex; flex-direction:column;
+}
+.sidebar.open { right:0; }
+.sidebar-top {
+  padding:20px 18px 16px;
+  background:linear-gradient(135deg,#FF6B9D,#9C27B0);
+  color:white; display:flex; align-items:center; justify-content:space-between;
+}
+.sidebar-top h2 { font-size:18px; font-weight:800; }
+.sidebar-close {
+  background:none; border:none; color:white;
+  font-size:22px; cursor:pointer; padding:2px 6px;
+  font-family:'Heebo',sans-serif; line-height:1;
+}
+.sidebar-nav { padding:10px 0; }
+.sidebar-link {
+  display:flex; align-items:center; gap:14px;
+  width:100%; padding:14px 20px;
+  font-family:'Heebo',sans-serif; font-size:16px; font-weight:600;
+  background:none; border:none; cursor:pointer;
+  color:var(--text); transition:background 0.15s; text-align:right;
+}
+.sidebar-link:hover { background:#F5F5F5; }
+.sidebar-link.active { background:#FFF5F9; color:var(--mili); font-weight:700; }
+.sidebar-link-icon { font-size:22px; }
+
+/* ─── HAMBURGER ─── */
+.hamburger-btn {
+  background:none; border:none; cursor:pointer;
+  font-size:24px; color:white; padding:4px 8px;
+  font-family:'Heebo',sans-serif; line-height:1;
+  border-radius:8px; transition:background 0.15s; flex-shrink:0;
+}
+.hamburger-btn:hover { background:rgba(255,255,255,0.18); }
+.hamburger-btn.dark { color:var(--text); }
+
+/* ─── HOME SCREEN ─── */
+#screen-home {
+  background:linear-gradient(155deg,#FF6B9D 0%,#9C27B0 52%,#00BCD4 100%);
+  color:white;
+}
+.home-topbar { padding:14px 16px; display:flex; align-items:center; }
+.home-body { padding:0 18px 48px; max-width:480px; margin:0 auto; }
+.home-hero { text-align:center; padding:16px 0 38px; }
+.home-hero-emoji { font-size:80px; margin-bottom:14px; }
+.home-hero h1 {
+  font-size:26px; font-weight:900; line-height:1.25;
+  margin-bottom:8px; text-shadow:0 2px 8px rgba(0,0,0,0.15);
+}
+.home-hero p { font-size:15px; opacity:0.85; }
+.home-cards { display:flex; flex-direction:column; gap:14px; }
+.home-card {
+  background:rgba(255,255,255,0.18);
+  backdrop-filter:blur(12px);
+  border:1.5px solid rgba(255,255,255,0.32);
+  border-radius:20px; padding:18px 20px;
+  display:flex; align-items:center; gap:16px;
+  cursor:pointer; transition:transform 0.18s, background 0.18s;
+}
+.home-card:active { transform:scale(0.98); background:rgba(255,255,255,0.28); }
+.home-card-icon { font-size:42px; }
+.home-card-body { flex:1; }
+.home-card-body h2 { font-size:18px; font-weight:800; margin-bottom:3px; }
+.home-card-body p { font-size:13px; opacity:0.8; }
+.home-card-arrow { font-size:22px; opacity:0.7; }
+
+/* ─── SCHEDULE SCREEN header tweak ─── */
+.schedule-topbar { display:flex; align-items:center; padding:0 6px 0 10px; }
+
+/* ─── HOUSE TASKS SCREEN ─── */
+#screen-house { background: #F7F9FC; }
+.house-topbar {
+  background: linear-gradient(135deg, #43A047, #1B5E20);
+  padding: 14px 16px; color: white;
+  display: flex; align-items: center; gap: 10px;
+  box-shadow: 0 3px 16px rgba(0,0,0,0.18);
+  position: sticky; top: 0; z-index: 100;
+}
+.house-topbar h1 { font-size: 20px; font-weight: 900; color: white; margin: 0; flex: 1; }
+.house-cats { padding: 12px 12px 40px; max-width: 540px; margin: 0 auto; }
+.house-cat-card {
+  background: white; border-radius: 18px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  overflow: hidden;
+  border-right: 5px solid var(--cc);
+}
+.house-cat-header {
+  padding: 11px 14px;
+  background: var(--cbg);
+  display: flex; align-items: center; gap: 9px;
+}
+.house-cat-icon { font-size: 22px; }
+.house-cat-title { font-size: 15px; font-weight: 800; flex: 1; color: var(--text); }
+.house-cat-meta { display: flex; align-items: center; gap: 8px; }
+.house-cat-progress { font-size: 11px; font-weight: 700; color: var(--muted); }
+.house-cat-reset-btn {
+  font-size: 11px; font-weight: 600; color: var(--muted);
+  background: none; border: 1px solid #DDD; border-radius: 20px;
+  padding: 2px 9px; cursor: pointer; font-family: 'Heebo', sans-serif;
+}
+.house-tasks-list { padding: 4px 0 8px; }
+.house-task-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 14px; cursor: pointer;
+  transition: background 0.12s;
+  border-bottom: 1px solid #F5F5F5;
+}
+.house-task-row:last-child { border-bottom: none; }
+.house-task-row:active { background: #F8F8F8; }
+.house-task-chk {
+  width: 24px; height: 24px; min-width: 24px; border-radius: 50%;
+  border: 2.5px solid #DDD; background: white;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; transition: all 0.2s; flex-shrink: 0;
+}
+.house-task-row.done .house-task-chk { background: var(--success); border-color: var(--success); color: white; }
+.house-task-emoji { font-size: 17px; min-width: 22px; text-align: center; }
+.house-task-info { flex: 1; min-width: 0; }
+.house-task-name { font-size: 14px; font-weight: 500; line-height: 1.3; }
+.house-task-row.done .house-task-name { text-decoration: line-through; color: var(--muted); }
+.house-task-note {
+  display: inline-block; margin-top: 2px;
+  font-size: 11px; font-weight: 700;
+  padding: 1px 7px; border-radius: 10px;
+  background: var(--cbg); color: var(--cc);
+}
+</style>
+</head>
+<body>
+
+<!-- Sidebar overlay -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<!-- Sidebar -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-top">
+    <h2>תפריט ✨</h2>
+    <button class="sidebar-close" onclick="closeSidebar()">✕</button>
+  </div>
+  <nav class="sidebar-nav">
+    <button class="sidebar-link active" id="nav-home" onclick="goTo('home')">
+      <span class="sidebar-link-icon">🏠</span> דף הבית
+    </button>
+    <button class="sidebar-link" id="nav-schedule" onclick="goTo('schedule')">
+      <span class="sidebar-link-icon">📅</span> סדר יום
+    </button>
+    <button class="sidebar-link" id="nav-house" onclick="goTo('house')">
+      <span class="sidebar-link-icon">🏡</span> משימות בית
+    </button>
+  </nav>
+</aside>
+
+<!-- HOME SCREEN -->
+<div id="screen-home" class="screen active">
+  <div class="home-topbar">
+    <button class="hamburger-btn" onclick="openSidebar()">☰</button>
+  </div>
+  <div class="home-body">
+    <div class="home-hero">
+      <div class="home-hero-emoji">✈️</div>
+      <h1>עדי נוסעת לבודפשט!</h1>
+      <p>הכל מסודר, הכל כאן 💕</p>
+    </div>
+    <div class="home-cards">
+      <div class="home-card" onclick="goTo('schedule')">
+        <div class="home-card-icon">📅</div>
+        <div class="home-card-body">
+          <h2>סדר יום</h2>
+          <p>משימות יומיות למילי ולתום</p>
+        </div>
+        <span class="home-card-arrow">←</span>
+      </div>
+      <div class="home-card" onclick="goTo('house')">
+        <div class="home-card-icon">🏡</div>
+        <div class="home-card-body">
+          <h2>משימות בית</h2>
+          <p>מה צריך לסדר בבית</p>
+        </div>
+        <span class="home-card-arrow">←</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCHEDULE SCREEN -->
+<div id="screen-schedule" class="screen">
+  <header class="app-header">
+    <div class="schedule-topbar">
+      <button class="hamburger-btn" onclick="openSidebar()">☰</button>
+      <div class="app-title">סדר היום שלנו 🦄🌈</div>
+    </div>
+    <div class="tabs" role="tablist">
+      <button class="tab-btn t-all  active" onclick="setTab('all')">🌈 הכל</button>
+      <button class="tab-btn t-mili" onclick="setTab('mili')">🌸 מילי</button>
+      <button class="tab-btn t-tom"  onclick="setTab('tom')">🚀 תום</button>
+    </div>
+  </header>
+  <main class="content" id="main-content"></main>
+</div>
+
+<!-- HOUSE TASKS SCREEN -->
+<div id="screen-house" class="screen">
+  <div class="house-topbar">
+    <button class="hamburger-btn" onclick="openSidebar()">☰</button>
+    <h1>🏡 משימות בית</h1>
+  </div>
+  <div class="house-cats" id="house-cats"></div>
+</div>
+
+<div id="unicorn-stage"></div>
+
+<script>
+// ════════════════════════════════════════════
+//  DAY DEFINITIONS
+// ════════════════════════════════════════════
+const DAYS = [
+  { id:'thu', label:'חמישי', jsDay:4, hasGan:true,  isFri:false, isSat:false, isSun:false, morningOnly:false },
+  { id:'fri', label:'שישי',  jsDay:5, hasGan:true,  isFri:true,  isSat:false, isSun:false, morningOnly:false },
+  { id:'sat', label:'שבת',   jsDay:6, hasGan:false, isFri:false, isSat:true,  isSun:false, morningOnly:false },
+  { id:'sun', label:'ראשון', jsDay:0, hasGan:true,  isFri:false, isSat:false, isSun:true,  morningOnly:false },
+  { id:'mon', label:'שני',   jsDay:1, hasGan:true,  isFri:false, isSat:false, isSun:false, morningOnly:false },
+  { id:'tue', label:'שלישי', jsDay:2, hasGan:true,  isFri:false, isSat:false, isSun:false, morningOnly:true  },
+];
+
+const TODAY_JS = new Date().getDay();
+const MEDS_DAYS = ['thu','fri','sat','sun'];
+
+// ════════════════════════════════════════════
+//  TASK GENERATORS
+// ════════════════════════════════════════════
+function getMiliTasks(day) {
+  const { id, hasGan, isFri, isSat, morningOnly } = day;
+  const hasMeds = MEDS_DAYS.includes(id);
+  const t = [];
+
+  // ── MORNING ──
+  t.push({ id:`mili-${id}-wake`, title:'השקמה', icon:'⏰', time:'morning', child:'mili',
+    desc:'להעיר את מילי עד השעה 7:30 ☀️' });
+
+  t.push({ id:`mili-${id}-bfast`, title:'ארוחת בוקר', icon:'🥣', time:'morning', child:'mili',
+    desc:'אפשרויות:\n• קראנצ׳\n• גמדים\n• סנדוויץ׳\n• קורנפלקס\n• גביניות' });
+
+  t.push({ id:`mili-${id}-hygiene`, title:'היגיינה', icon:'🪥', time:'morning', child:'mili',
+    desc:'שטיפת פנים וידיים 💧\nצחצוח שיניים 🦷' });
+
+  if (hasMeds) {
+    t.push({ id:`mili-${id}-meds`, title:'תרופות', icon:'💊', time:'morning', child:'mili',
+      desc:'פילפילון כתום + אנטיביוטיקה 💊\n⚠️ רק עד יום ראשון בבוקר!' });
+  }
+
+  t.push({ id:`mili-${id}-dress`, title:'לבוש', icon:'👗', time:'morning', child:'mili',
+    desc:'לתת למילי 2 אפשרויות לבגדים שתבחר בעצמה 👑\n\n⚠️ אם שמלה / חצאית — חייבים מכנסיים מתחת!' });
+
+  if (hasGan) {
+    t.push({ id:`mili-${id}-hair`, title:'שיער', icon:'💇‍♀️', time:'morning', child:'mili',
+      desc:'• לשים ספריי נגד כינים 🌿\n• לסרק היטב\n• לאסוף את השיער לגמרי\n• אפשר להוסיף סיכות יפות 🎀' });
+
+    t.push({ id:`mili-${id}-bag`, title:'תיק גן', icon:'🎒', time:'morning', child:'mili',
+      desc:'לבדוק שיש:\n✅ מים\n✅ בגדים להחלפה\n✅ תחתונים וגרביים' });
+  }
+
+  if (morningOnly) return t;
+
+  // ── AFTERNOON ──
+  if (isSat) {
+    t.push({ id:`mili-${id}-screens`, title:'פעילות מסכים', icon:'📺', time:'afternoon', child:'mili',
+      desc:'📺 40 דקות טלוויזיה\n✅ מותר רק אם תום ישן בזמן הזה' });
+  } else if (isFri) {
+    t.push({ id:`mili-${id}-pickup`, title:'איסוף מהגן', icon:'🏫', time:'afternoon', child:'mili',
+      desc:'לאסוף את מילי מהגן עד השעה 12:00 🕛' });
+
+    t.push({ id:`mili-${id}-screens`, title:'פעילות מסכים', icon:'📺', time:'afternoon', child:'mili',
+      desc:'📺 40 דקות טלוויזיה\n✅ מותר רק אם תום ישן בזמן הזה' });
+
+    t.push({ id:`mili-${id}-activity`, title:'פעילות', icon:'🌳', time:'afternoon', child:'mili',
+      desc:'אפשרויות:\n• ללכת למכולת 🛒\n• גלידה 🍦 — פעם אחת בשבוע בלבד!\n• לגינה 🌿' });
+
+    t.push({ id:`mili-${id}-home`, title:'חזרה הביתה', icon:'🏠', time:'afternoon', child:'mili',
+      desc:'לחזור הביתה עד השעה 17:40 🏡' });
+
+    t.push({ id:`mili-${id}-lunch`, title:'ארוחת צהריים', icon:'🥗', time:'afternoon', child:'mili',
+      desc:'ארוחה קלילה או חלבית 🧀' });
+  } else {
+    t.push({ id:`mili-${id}-pickup`, title:'איסוף מהגן', icon:'🏫', time:'afternoon', child:'mili',
+      desc:'לאסוף את מילי מהגן עד השעה 16:45 🕓' });
+
+    t.push({ id:`mili-${id}-activity`, title:'פעילות', icon:'🌳', time:'afternoon', child:'mili',
+      desc:'אפשרויות:\n• ללכת למכולת 🛒\n• גלידה 🍦 — פעם אחת בשבוע בלבד!\n• לגינה 🌿' });
+
+    t.push({ id:`mili-${id}-home`, title:'חזרה הביתה', icon:'🏠', time:'afternoon', child:'mili',
+      desc:'לחזור הביתה עד השעה 17:40 🏡' });
+  }
+
+  // ── EVENING ──
+  if (isFri) {
+    t.push({ id:`mili-${id}-dinner`, title:'ארוחת ערב חגיגית 🕯️', icon:'🍖', time:'evening', child:'mili',
+      desc:'ארוחה בשרית חגיגית לכבוד שבת! 🕯️✨' });
+  } else {
+    t.push({ id:`mili-${id}-dinner`, title:'ארוחת ערב', icon:'🍽️', time:'evening', child:'mili',
+      desc:'ארוחת ערב 🍽️' });
+  }
+
+  t.push({ id:`mili-${id}-shower`, title:'מקלחת', icon:'🚿', time:'evening', child:'mili',
+    desc:'זמן מקלחת! 🚿🫧' });
+
+  t.push({ id:`mili-${id}-toilet`, title:'שירותים לפני השינה', icon:'🚽', time:'evening', child:'mili',
+    desc:'לוודא שמילי הולכת לשירותים לפני שנרדמת 🚽' });
+
+  t.push({ id:`mili-${id}-bedprep`, title:'התארגנות לשינה', icon:'🛏️', time:'evening', child:'mili',
+    desc:'• צחצוח שיניים 🦷\n• להתלבש בחדר 🌙\n• לסדר: סדין, ציפיות, שמיכות 🛏️\n• להכין בגדים להחלפה ליד — למקרה שיברח לה\n• ישנה עם תחתונים רגילים 💕' });
+
+  t.push({ id:`mili-${id}-sleep`, title:'השכבה', icon:'📖', time:'evening', child:'mili',
+    desc:'📖 סיפור לפני השינה במיטה\n💤 להישאר עם מילי עד שהיא נרדמת' });
+
+  return t;
+}
+
+function getTomTasks(day) {
+  const { id, hasGan, isFri, isSat, isSun, morningOnly } = day;
+  const t = [];
+
+  // ── MORNING ──
+  if (isSat) {
+    t.push({ id:`tom-${id}-mornnap`, title:'שנת בוקר', icon:'😴', time:'morning', child:'tom',
+      desc:'לפי ההשקמה — לבדוק אם יש צורך בשנת בוקר 😴' });
+  }
+
+  t.push({ id:`tom-${id}-wake`, title:'השקמה', icon:'⏰', time:'morning', child:'tom',
+    desc:'אם לא קם לבד — להעיר עד השעה 7:30 ☀️' });
+
+  t.push({ id:`tom-${id}-bfast`, title:'ארוחת בוקר', icon:'🥣', time:'morning', child:'tom',
+    desc:'אפשרויות:\n• בננה 🍌\n• גמדים\n• סנדוויץ׳\n• יוגורט עם פרי 🍓\n• גביניות' });
+
+  t.push({ id:`tom-${id}-hygiene`, title:'היגיינה', icon:'🪥', time:'morning', child:'tom',
+    desc:'שטיפת פנים וידיים 💧\nצחצוח שיניים 🦷' });
+
+  t.push({ id:`tom-${id}-dress`, title:'התלבשות', icon:'👕', time:'morning', child:'tom',
+    desc:'להתלבש לפני היציאה 👕' });
+
+  if (hasGan) {
+    const bagDesc = isSun
+      ? 'לבדוק שיש:\n✅ מים\n✅ שני סטים של בגדים להחלפה\n⭐ יום ראשון: להביא גם סדין ושמיכה!'
+      : 'לבדוק שיש:\n✅ מים\n✅ שני סטים של בגדים להחלפה';
+
+    t.push({ id:`tom-${id}-bag`, title:'תיק גן', icon:'🎒', time:'morning', child:'tom',
+      desc: bagDesc });
+  }
+
+  if (morningOnly) return t;
+
+  // ── AFTERNOON ──
+  if (isSat) {
+    t.push({ id:`tom-${id}-noonnap`, title:'שנת צהריים', icon:'💤', time:'afternoon', child:'tom',
+      desc:'לפי ההשקמה מהשנת בוקר — לבדוק אם יש צורך בשנת צהריים 💤' });
+  } else if (isFri) {
+    t.push({ id:`tom-${id}-pickup`, title:'איסוף מהגן', icon:'🏫', time:'afternoon', child:'tom',
+      desc:'לאסוף את תום מהגן עד השעה 12:00 🕛' });
+
+    t.push({ id:`tom-${id}-nap`, title:'שנת אחר הצהריים', icon:'😴', time:'afternoon', child:'tom',
+      desc:'תום ישן בדרך כלל בחזרה מהגן וממשיך לישון בבית 💤\nחשוב לנוח לפני שבת!' });
+
+    t.push({ id:`tom-${id}-lunch`, title:'ארוחת צהריים', icon:'🥗', time:'afternoon', child:'tom',
+      desc:'ארוחה קלילה 🥗' });
+  } else {
+    t.push({ id:`tom-${id}-pickup`, title:'איסוף מהגן', icon:'🏫', time:'afternoon', child:'tom',
+      desc:'לאסוף את תום מהגן עד השעה 16:30 🕞' });
+
+    t.push({ id:`tom-${id}-activity`, title:'פעילות אחר הצהריים', icon:'🌳', time:'afternoon', child:'tom',
+      desc:'אפשרויות:\n• גינה 🌿\n• מכולת 🛒\n• הביתה 🏡' });
+
+    t.push({ id:`tom-${id}-home`, title:'חזרה הביתה', icon:'🏠', time:'afternoon', child:'tom',
+      desc:'לחזור הביתה עד השעה 17:40 🏡' });
+  }
+
+  // ── EVENING ──
+  if (isFri) {
+    t.push({ id:`tom-${id}-dinner`, title:'ארוחת ערב 🕯️', icon:'🍖', time:'evening', child:'tom',
+      desc:'ארוחה בשרית לכבוד שבת 🕯️🍖' });
+  } else {
+    t.push({ id:`tom-${id}-dinner`, title:'ארוחת ערב', icon:'🍽️', time:'evening', child:'tom',
+      desc:'לשבת לאכול עד השעה 18:30 🍽️' });
+  }
+
+  t.push({ id:`tom-${id}-shower`, title:'מקלחת + ברזל', icon:'🚿', time:'evening', child:'tom',
+    desc:'להכניס למקלחת עד השעה 19:00 🚿\n💊 חשוב: תום צריך לקבל ברזל!' });
+
+  t.push({ id:`tom-${id}-bedprep`, title:'התארגנות לשינה', icon:'🛏️', time:'evening', child:'tom',
+    desc:'להתלבש לשינה בחדר 🌙' });
+
+  t.push({ id:`tom-${id}-sleep`, title:'השכבה', icon:'🌙', time:'evening', child:'tom',
+    desc:'📖 סיפור לפני השינה עם מילי\nאו 🎵 לשיר שיר על הידיים ולהניח במיטה 💤' });
+
+  return t;
+}
+
+function getAllTasks(day, tab) {
+  if (tab === 'mili') return getMiliTasks(day);
+  if (tab === 'tom')  return getTomTasks(day);
+
+  // Combined: pair matching tasks (same key) together, then any unmatched
+  const mili = getMiliTasks(day);
+  const tom  = getTomTasks(day);
+  const taskKey = id => id.split('-').slice(2).join('-'); // "mili-thu-wake" → "wake"
+  const result  = [];
+
+  for (const time of ['morning', 'afternoon', 'evening']) {
+    const mT = mili.filter(t => t.time === time);
+    const tT = tom.filter(t => t.time === time);
+    const tomByKey   = Object.fromEntries(tT.map(t => [taskKey(t.id), t]));
+    const usedTomKeys = new Set();
+
+    for (const mt of mT) {
+      result.push(mt);
+      const k = taskKey(mt.id);
+      if (tomByKey[k]) { result.push(tomByKey[k]); usedTomKeys.add(k); }
+    }
+    // Tom-only tasks for this period (no mili counterpart)
+    for (const tt of tT) {
+      if (!usedTomKeys.has(taskKey(tt.id))) result.push(tt);
+    }
+  }
+  return result;
+}
+
+// ════════════════════════════════════════════
+//  STATE & STORAGE
+// ════════════════════════════════════════════
+let currentTab   = 'all';
+let expandedDays  = {};
+let expandedTasks = {};
+
+// Safe storage — falls back to in-memory if localStorage is blocked (e.g. sandboxed iframe)
+let _mem = {};
+function _lsGet(k)    { try { return localStorage.getItem(k); }    catch(e) { return _mem[k] || null; } }
+function _lsSet(k, v) { try { localStorage.setItem(k, v); }        catch(e) { _mem[k] = v; } }
+function _lsDel(k)    { try { localStorage.removeItem(k); }         catch(e) { delete _mem[k]; } }
+function _lsKeys()    { try { return Object.keys(localStorage); }   catch(e) { return Object.keys(_mem); } }
+
+const store = {
+  isDone:   (dayId, taskId) => _lsGet(`done_${dayId}_${taskId}`) === '1',
+  setDone:  (dayId, taskId, v) => v ? _lsSet(`done_${dayId}_${taskId}`, '1') : _lsDel(`done_${dayId}_${taskId}`),
+  resetDay: (dayId) => _lsKeys().filter(k => k.startsWith(`done_${dayId}_`)).forEach(k => _lsDel(k)),
+};
+
+// ════════════════════════════════════════════
+//  RENDER HELPERS
+// ════════════════════════════════════════════
+function progressRing(done, total, tab) {
+  const r = 17, cx = 23, cy = 23;
+  const circ = +(2 * Math.PI * r).toFixed(1);
+  const pct  = total ? done / total : 0;
+  const off  = +(circ - pct * circ).toFixed(1);
+  const col  = tab==='mili' ? 'var(--mili)' : tab==='tom' ? 'var(--tom)' : '#9C27B0';
+  const lbl  = total ? `${done}/${total}` : '-';
+  return `<div class="progress-ring-wrap">
+    <svg width="46" height="46" viewBox="0 0 46 46">
+      <circle class="progress-ring-bg"   cx="${cx}" cy="${cy}" r="${r}"/>
+      <circle class="progress-ring-fill" cx="${cx}" cy="${cy}" r="${r}"
+        stroke="${col}" stroke-dasharray="${circ}" stroke-dashoffset="${off}"/>
+    </svg>
+    <div class="progress-ring-text">${lbl}</div>
+  </div>`;
+}
+
+function renderTask(task, dayId, showLabel) {
+  const done     = store.isDone(dayId, task.id);
+  const expanded = expandedTasks[task.id] || false;
+  const label    = showLabel
+    ? `<span class="child-label ${task.child}">${task.child==='mili'?'מילי 🌸':'תום 🚀'}</span>`
+    : '';
+  return `
+  <div class="task-item${done?' done':''}${expanded?' expanded':''}" id="task-${task.id}">
+    <div class="task-head" onclick="toggleTask('${task.id}','${dayId}',event)">
+      <div class="task-check-btn" onclick="checkTask(event,'${task.id}','${dayId}')">${done?'✓':''}</div>
+      <span class="task-icon-emoji">${task.icon}</span>
+      <div class="task-title-wrap"><div class="task-title-text">${task.title}</div></div>
+      ${label}
+      <span class="task-chevron">▾</span>
+    </div>
+    <div class="task-desc"><p>${task.desc.replace(/\n/g,'<br>')}</p></div>
+  </div>`;
+}
+
+function renderDayCard(day) {
+  const tasks = getAllTasks(day, currentTab);
+  const isOpen = expandedDays[day.id] !== false;
+  const done   = tasks.filter(t => store.isDone(day.id, t.id)).length;
+  const allDone = tasks.length > 0 && done === tasks.length;
+  const isToday = day.jsDay === TODAY_JS;
+  const showLabel = currentTab === 'all';
+
+  let badges = '';
+  if (day.hasGan) badges += `<span class="badge badge-gan">🏫 גן</span>`;
+  else            badges += `<span class="badge badge-nogan">🌟 שבת</span>`;
+  if (day.isFri)       badges += `<span class="badge badge-short">⚡ יום קצר</span>`;
+  if (day.morningOnly) badges += `<span class="badge badge-morn">🌅 בוקר בלבד</span>`;
+  if (isToday)         badges += `<span class="badge badge-today">📍 היום</span>`;
+
+  const hdrClass = currentTab==='all' ? 'all-header' : `${currentTab}-header`;
+
+  const morningTasks   = tasks.filter(t => t.time === 'morning');
+  const afternoonTasks = tasks.filter(t => t.time === 'afternoon');
+  const eveningTasks   = tasks.filter(t => t.time === 'evening');
+
+  let body = '';
+  if (allDone && tasks.length > 0) {
+    body += `<div class="all-done-banner">🏆 כל המשימות של היום הושלמו! 🌟🦄</div>`;
+  }
+  const sectionBlock = (sectionTasks, cls, label, icon) => {
+    if (!sectionTasks.length) return '';
+    const ids = sectionTasks.map(t => t.id);
+    const allChecked = ids.every(id => store.isDone(day.id, id));
+    const btnClass = allChecked ? 'section-check-all all-checked' : 'section-check-all';
+    const btnLabel = allChecked ? '✓ הכל' : 'סמן הכל';
+    return `<div class="time-section">
+      <div class="time-label ${cls}">
+        ${icon} ${label}
+        <button class="${btnClass}" onclick="checkSection(event,'${day.id}','${ids.join(',')}')"><span>${btnLabel}</span></button>
+      </div>
+      ${sectionTasks.map(t => renderTask(t,day.id,showLabel)).join('')}
+    </div>`;
+  };
+
+  if (morningTasks.length)   body += sectionBlock(morningTasks,   'morning',   'בוקר',   '☀️');
+  if (afternoonTasks.length) body += sectionBlock(afternoonTasks, 'afternoon', 'צהריים', '🌤️');
+  if (eveningTasks.length)   body += sectionBlock(eveningTasks,   'evening',   'ערב',    '🌙');
+  if (!body) body = `<div class="empty-day">אין משימות ליום זה</div>`;
+  body += `<button class="day-reset-btn" onclick="handleResetDay(event,'${day.id}')">↺ איפוס יום</button>`;
+
+  return `<div class="day-card${isOpen?' open':''}${allDone?' all-done':''}" id="day-${day.id}">
+    <div class="day-card-header ${hdrClass}" onclick="toggleDay('${day.id}')">
+      <div class="day-left">
+        <div class="day-name">${day.label}</div>
+        <div class="day-badges">${badges}</div>
+      </div>
+      <div class="day-right">
+        ${progressRing(done, tasks.length, currentTab)}
+        <span class="toggle-icon">▾</span>
+      </div>
+    </div>
+    <div class="day-body">${body}</div>
+  </div>`;
+}
+
+function render() {
+  document.getElementById('main-content').innerHTML = DAYS.map(d => renderDayCard(d)).join('');
+  // Scroll to today
+  const todayDay = DAYS.find(d => d.jsDay === TODAY_JS);
+  if (todayDay) {
+    const el = document.getElementById(`day-${todayDay.id}`);
+    if (el) setTimeout(() => el.scrollIntoView({ behavior:'smooth', block:'start' }), 120);
+  }
+}
+
+function refreshCard(dayId) {
+  const day = DAYS.find(d => d.id === dayId);
+  if (!day) return;
+  const old = document.getElementById(`day-${dayId}`);
+  if (!old) return;
+  const tmp = document.createElement('div');
+  tmp.innerHTML = renderDayCard(day);
+  old.replaceWith(tmp.firstElementChild);
+}
+
+// ════════════════════════════════════════════
+//  EVENT HANDLERS
+// ════════════════════════════════════════════
+function setTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.t-${tab}`).classList.add('active');
+  render();
+}
+
+function toggleDay(dayId) {
+  const isOpen = expandedDays[dayId] !== false;
+  expandedDays[dayId] = !isOpen;
+  const card = document.getElementById(`day-${dayId}`);
+  if (card) card.classList.toggle('open', expandedDays[dayId]);
+}
+
+function toggleTask(taskId, dayId, e) {
+  if (e.target.classList.contains('task-check-btn')) return;
+  expandedTasks[taskId] = !expandedTasks[taskId];
+  const el = document.getElementById(`task-${taskId}`);
+  if (el) el.classList.toggle('expanded', expandedTasks[taskId]);
+}
+
+function checkTask(e, taskId, dayId) {
+  e.stopPropagation();
+  const wasDone = store.isDone(dayId, taskId);
+  store.setDone(dayId, taskId, !wasDone);
+  if (!wasDone) {
+    launchUnicorn();
+    // If every task in the day is now done → clapping after unicorn finishes
+    const day = DAYS.find(d => d.id === dayId);
+    const tasks = getAllTasks(day, currentTab);
+    if (tasks.length > 0 && tasks.every(t => store.isDone(dayId, t.id))) {
+      setTimeout(launchClapping, 1400);
+    }
+  }
+  refreshCard(dayId);
+}
+
+function checkSection(e, dayId, idsStr) {
+  e.stopPropagation();
+  const ids = idsStr.split(',');
+  const allDone = ids.every(id => store.isDone(dayId, id));
+  // Toggle: if all done → uncheck all; otherwise → check all
+  ids.forEach(id => store.setDone(dayId, id, !allDone));
+  if (!allDone) {
+    launchUnicorn();
+    // Check if entire day is now complete
+    const day = DAYS.find(d => d.id === dayId);
+    const tasks = getAllTasks(day, currentTab);
+    if (tasks.length > 0 && tasks.every(t => store.isDone(dayId, t.id))) {
+      setTimeout(launchClapping, 1400);
+    }
+  }
+  refreshCard(dayId);
+}
+
+function handleResetDay(e, dayId) {
+  e.stopPropagation();
+  store.resetDay(dayId);
+  refreshCard(dayId);
+}
+
+// ════════════════════════════════════════════
+//  ANIMATIONS
+// ════════════════════════════════════════════
+
+// 🦄 Unicorn — fires on every task completion
+function launchUnicorn() {
+  const stage = document.getElementById('unicorn-stage');
+  stage.innerHTML = '';
+  const top = 20 + Math.random() * 48;
+
+  const flyer = document.createElement('div');
+  flyer.className = 'uni-flyer';
+  flyer.style.top = top + '%';
+  flyer.textContent = '🦄';
+  stage.appendChild(flyer);
+
+  const trail = document.createElement('div');
+  trail.className = 'uni-trail';
+  trail.style.top = (top + 4) + '%';
+  trail.textContent = '🌈';
+  stage.appendChild(trail);
+
+  const sparks = ['✨','💫','⭐','🌟','💖','🌸','🎀'];
+  for (let i = 0; i < 10; i++) {
+    setTimeout(() => {
+      const s = document.createElement('div');
+      s.className = 'uni-sparkle';
+      s.style.top        = (6 + Math.random() * 85) + '%';
+      s.style.left       = (6 + Math.random() * 85) + '%';
+      s.style.fontSize   = (14 + Math.random() * 18) + 'px';
+      s.style.animationDelay = (Math.random() * 0.35) + 's';
+      s.textContent = sparks[Math.floor(Math.random() * sparks.length)];
+      stage.appendChild(s);
+    }, i * 75);
+  }
+  setTimeout(() => { stage.innerHTML = ''; }, 3200);
+}
+
+// 👏 Clapping (Slack-style) — fires when ALL tasks in a day are done
+function launchClapping() {
+  const stage = document.getElementById('unicorn-stage');
+  stage.innerHTML = '';
+
+  // White flash
+  const flash = document.createElement('div');
+  flash.className = 'clap-flash';
+  stage.appendChild(flash);
+
+  // Big hands in center
+  const main = document.createElement('div');
+  main.className = 'clap-main';
+  main.textContent = '👏';
+  stage.appendChild(main);
+
+  // Burst ring of emojis
+  const burstSet = ['👏','🎉','🌟','✨','💖','🎊','🥳','⭐','💫','🙌','🎈','🎀'];
+  const count = 14;
+  for (let i = 0; i < count; i++) {
+    const el = document.createElement('div');
+    el.className = 'clap-burst';
+    const angle = (i / count) * 360;
+    const dist  = 110 + Math.random() * 110;
+    const tx    = Math.cos(angle * Math.PI / 180) * dist;
+    const ty    = Math.sin(angle * Math.PI / 180) * dist;
+    const fs    = 22 + Math.random() * 28;
+    const d     = 1.1 + Math.random() * 0.9;
+    const delay = 0.08 + (i / count) * 0.28;
+    el.style.cssText = `--tx:${tx.toFixed(0)}px;--ty:${ty.toFixed(0)}px;--fs:${fs.toFixed(0)}px;--d:${d.toFixed(2)}s;--delay:${delay.toFixed(2)}s`;
+    el.textContent = burstSet[i % burstSet.length];
+    stage.appendChild(el);
+  }
+  setTimeout(() => { stage.innerHTML = ''; }, 3800);
+}
+
+// ════════════════════════════════════════════
+//  HOUSE TASKS
+// ════════════════════════════════════════════
+const HOUSE_CATS = [
+  {
+    id:'animals', title:'חיות', icon:'🐾', cc:'#FF7043', cbg:'#FFF3E0',
+    tasks:[
+      { id:'h-sand',         icon:'🪣', name:'החלפת חול',                note:'כל יומיים' },
+      { id:'h-plaffy-meds',  icon:'💊', name:'תרופות לפלאפי',            note:'כל יום' },
+      { id:'h-lefni-meds',   icon:'💊', name:'תרופות לפני',              note:'יום כן יום לא' },
+      { id:'h-luna-meds-m',  icon:'🌅', name:'תרופות בוקר ללונה',        note:'' },
+      { id:'h-luna-meds-e',  icon:'🌙', name:'תרופות ערב ללונה',         note:'' },
+      { id:'h-luna-out-m',   icon:'🐕', name:'להוציא את לונה בבוקר',    note:'' },
+      { id:'h-luna-out-e',   icon:'🐕', name:'להוציא את לונה בערב',     note:'' },
+      { id:'h-cat-food',     icon:'🐱', name:'אוכל לחתולים',             note:'' },
+      { id:'h-luna-food',    icon:'🥣', name:'אוכל ללונה',               note:'' },
+      { id:'h-water',        icon:'💧', name:'מים לחיות',                note:'' },
+    ]
+  },
+  {
+    id:'cleaning', title:'ניקיון', icon:'🧹', cc:'#1E88E5', cbg:'#E3F2FD',
+    tasks:[
+      { id:'h-sweep',       icon:'🧹', name:'לטאטא את הבית',            note:'כל ערב' },
+      { id:'h-sofa',        icon:'🛋️', name:'לשאוב את הספה',            note:'כל ערב' },
+      { id:'h-floor',       icon:'🫧', name:'לשטוף את הבית',            note:'שבת' },
+      { id:'h-dust',        icon:'🧽', name:'לנקות אבק מהשידות',        note:'שישי' },
+      { id:'h-kids-sweep',  icon:'🧹', name:'לטאטא חדר ילדים',          note:'שישי' },
+    ]
+  },
+  {
+    id:'tidy', title:'סידור בסוף יום', icon:'🏠', cc:'#8E24AA', cbg:'#F3E5F5',
+    tasks:[
+      { id:'h-toys',   icon:'🧸', name:'צעצועים במקום',                  note:'' },
+      { id:'h-books',  icon:'📚', name:'ספרים במקום',                    note:'' },
+      { id:'h-table',  icon:'🍽️', name:'שולחן ורצפה נקיים אחרי אוכל',  note:'' },
+    ]
+  },
+  {
+    id:'laundry', title:'כביסה', icon:'👕', cc:'#00ACC1', cbg:'#E0F7FA',
+    tasks:[
+      { id:'h-laundry', icon:'🫧', name:'כביסה', note:'כל יומיים' },
+    ]
+  },
+  {
+    id:'dishes', title:'כלים', icon:'🍽️', cc:'#FB8C00', cbg:'#FFF8E1',
+    tasks:[
+      { id:'h-dishes', icon:'🧼', name:'לשטוף כלים', note:'כל סוף יום' },
+    ]
+  },
+  {
+    id:'plants', title:'עציצים', icon:'🌿', cc:'#43A047', cbg:'#E8F5E9',
+    tasks:[
+      { id:'h-plants', icon:'🪴', name:'להשקות עציצים במרפסת', note:'' },
+    ]
+  },
+  {
+    id:'bedding', title:'מצעים', icon:'🛏️', cc:'#E91E63', cbg:'#FCE4EC',
+    tasks:[
+      { id:'h-bed-fri',  icon:'🛏️', name:'מצעים לסבא גלעד וסבתא שרית',  note:'שישי' },
+      { id:'h-bed-sun',  icon:'🛏️', name:'מצעים לסבתא שרית',            note:'ראשון' },
+    ]
+  },
+  {
+    id:'trash', title:'זבל', icon:'🗑️', cc:'#546E7A', cbg:'#ECEFF1',
+    tasks:[
+      { id:'h-trash', icon:'🗑️', name:'לזרוק זבל', note:'כל ערב' },
+    ]
+  },
+  {
+    id:'market', title:'קניות סופר', icon:'🛒', cc:'#EF5350', cbg:'#FFEBEE',
+    tasks:[
+      { id:'h-grocery', icon:'🛒', name:'הזמנת סופר לפי הצורך', note:'ראשון' },
+    ]
+  },
+  {
+    id:'pharma', title:'סופר פארם', icon:'💊', cc:'#00897B', cbg:'#E0F2F1',
+    tasks:[
+      { id:'h-diapers', icon:'👶', name:'חיתולים ומגבונים לתום', note:'שני' },
+    ]
+  },
+];
+
+function isHouseDone(taskId) { return _lsGet(`house_${taskId}`) === '1'; }
+function setHouseDone(taskId, v) { v ? _lsSet(`house_${taskId}`,'1') : _lsDel(`house_${taskId}`); }
+
+function renderHouseScreen() {
+  const el = document.getElementById('house-cats');
+  if (!el) return;
+  el.innerHTML = HOUSE_CATS.map(cat => {
+    const done = cat.tasks.filter(t => isHouseDone(t.id)).length;
+    const total = cat.tasks.length;
+    const tasks = cat.tasks.map(t => {
+      const isDone = isHouseDone(t.id);
+      return `<div class="house-task-row${isDone?' done':''}" onclick="toggleHouseTask('${t.id}','${cat.id}')">
+        <div class="house-task-chk">${isDone?'✓':''}</div>
+        <span class="house-task-emoji">${t.icon}</span>
+        <div class="house-task-info">
+          <div class="house-task-name">${t.name}</div>
+          ${t.note ? `<span class="house-task-note">${t.note}</span>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+    return `<div class="house-cat-card" style="--cc:${cat.cc};--cbg:${cat.cbg}">
+      <div class="house-cat-header">
+        <span class="house-cat-icon">${cat.icon}</span>
+        <span class="house-cat-title">${cat.title}</span>
+        <div class="house-cat-meta">
+          <span class="house-cat-progress">${done}/${total}</span>
+          <button class="house-cat-reset-btn" onclick="resetHouseCat(event,'${cat.id}')">↺</button>
+        </div>
+      </div>
+      <div class="house-tasks-list">${tasks}</div>
+    </div>`;
+  }).join('');
+}
+
+function toggleHouseTask(taskId, catId) {
+  const wasDone = isHouseDone(taskId);
+  setHouseDone(taskId, !wasDone);
+  if (!wasDone) launchUnicorn();
+  renderHouseScreen();
+}
+
+function resetHouseCat(e, catId) {
+  e.stopPropagation();
+  const cat = HOUSE_CATS.find(c => c.id === catId);
+  if (cat) cat.tasks.forEach(t => setHouseDone(t.id, false));
+  renderHouseScreen();
+}
+
+// ════════════════════════════════════════════
+//  NAVIGATION
+// ════════════════════════════════════════════
+function goTo(screen) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(`screen-${screen}`).classList.add('active');
+  document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+  const navEl = document.getElementById(`nav-${screen}`);
+  if (navEl) navEl.classList.add('active');
+  closeSidebar();
+  window.scrollTo(0, 0);
+}
+
+function openSidebar() {
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('sidebarOverlay').classList.add('open');
+}
+
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('open');
+}
+
+// ════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════
+render();
+renderHouseScreen();
+</script>
+</body>
+</html>
